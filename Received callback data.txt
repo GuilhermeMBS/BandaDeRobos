@@ -1,0 +1,37 @@
+Received callback data:
+{
+  "code": 200,
+  "data": {
+    "callbackType": "text",
+    "data": [
+      {
+        "audio_url": "",
+        "createTime": 1751578578764,
+        "id": "99493ac0-eae3-49e4-a985-dea7fcaf9fb4",
+        "image_url": "https://apiboxfiles.erweima.ai/OTk0OTNhYzAtZWFlMy00OWU0LWE5ODUtZGVhN2ZjYWY5ZmI0.jpeg",
+        "model_name": "chirp-v4",
+        "prompt": "[Verse]\nTyping lines into the night\nLogic flows like streams of light\nSyntax whispers secrets clear\nCode is magic\nIt\u2019s all right here\n\n[Verse 2]\nDebugging dreams\nI chase the spark\nIn a sea of brackets\nLeave my mark\nVariables dance\nLoops entwine\nInfinite worlds in a single line\n\n[Chorus]\nOh binary\nYou\u2019re my muse\nZeros and ones\nI can\u2019t refuse\nCompile my heart\nLet it ignite\nIn the program of my life tonight\n\n[Verse 3]\nFunctions calling\nThey never rest\nStacking knowledge\nI pass the test\nArrays of hope\nI navigate\nAlgorithms sealing my fate\n\n[Bridge]\nError messages sing to me\nA melody of mystery\nI\u2019ll solve the riddle\nBreak the chain\nIn this code\nI\u2019ll always remain\n\n[Chorus]\nOh binary\nYou\u2019re my muse\nZeros and ones\nI can\u2019t refuse\nCompile my heart\nLet it ignite\nIn the program of my life tonight",
+        "source_image_url": "https://cdn2.suno.ai/image_99493ac0-eae3-49e4-a985-dea7fcaf9fb4.jpeg",
+        "source_stream_audio_url": "https://audiopipe.suno.ai/?item_id=99493ac0-eae3-49e4-a985-dea7fcaf9fb4",
+        "stream_audio_url": "https://mfile.erweima.ai/OTk0OTNhYzAtZWFlMy00OWU0LWE5ODUtZGVhN2ZjYWY5ZmI0",
+        "tags": "electronic, playful",
+        "title": "Code Symphony"
+      },
+      {
+        "audio_url": "",
+        "createTime": 1751578578764,
+        "id": "33ef84f9-a7a6-488a-b931-b643382199f5",
+        "image_url": "https://apiboxfiles.erweima.ai/MzNlZjg0ZjktYTdhNi00ODhhLWI5MzEtYjY0MzM4MjE5OWY1.jpeg",
+        "model_name": "chirp-v4",
+        "prompt": "[Verse]\nTyping lines into the night\nLogic flows like streams of light\nSyntax whispers secrets clear\nCode is magic\nIt\u2019s all right here\n\n[Verse 2]\nDebugging dreams\nI chase the spark\nIn a sea of brackets\nLeave my mark\nVariables dance\nLoops entwine\nInfinite worlds in a single line\n\n[Chorus]\nOh binary\nYou\u2019re my muse\nZeros and ones\nI can\u2019t refuse\nCompile my heart\nLet it ignite\nIn the program of my life tonight\n\n[Verse 3]\nFunctions calling\nThey never rest\nStacking knowledge\nI pass the test\nArrays of hope\nI navigate\nAlgorithms sealing my fate\n\n[Bridge]\nError messages sing to me\nA melody of mystery\nI\u2019ll solve the riddle\nBreak the chain\nIn this code\nI\u2019ll always remain\n\n[Chorus]\nOh binary\nYou\u2019re my muse\nZeros and ones\nI can\u2019t refuse\nCompile my heart\nLet it ignite\nIn the program of my life tonight",
+        "source_image_url": "https://cdn2.suno.ai/image_33ef84f9-a7a6-488a-b931-b643382199f5.jpeg",
+        "source_stream_audio_url": "https://audiopipe.suno.ai/?item_id=33ef84f9-a7a6-488a-b931-b643382199f5",
+        "stream_audio_url": "https://mfile.erweima.ai/MzNlZjg0ZjktYTdhNi00ODhhLWI5MzEtYjY0MzM4MjE5OWY1",
+        "tags": "electronic, playful",
+        "title": "Code Symphony"
+      }
+    ],
+    "task_id": "ae6a6c6a864aa6e5f0fcadbf3b31e818"
+  },
+  "msg": "Text generated successfully."
+}
