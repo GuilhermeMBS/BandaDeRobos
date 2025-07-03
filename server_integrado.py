@@ -3,7 +3,7 @@ import requests
 from flask import Flask, request, jsonify
 from datetime import datetime
 
-API_KEY = "b0247d1195078eed69b0c30383d65ae3"
+API_KEY = ""
 API_URL = "https://apibox.erweima.ai/api/v1/generate"
 PORT = 5000
 
