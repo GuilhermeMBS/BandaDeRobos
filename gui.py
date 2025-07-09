@@ -1,12 +1,15 @@
-import threading, requests
+# gui.py
+import threading
+import requests
 import tkinter as tk
-from tkinter import filedialog, messagebox
+from tkinter import filedialog, messagebox, simpledialog
 
 # === Serial-reading stub ===
 meu_serial = None  # Replace/initialize your Serial here
 
 # === Configuration ===
-API_BASE = "https://apibox.erweima.ai/api/v1/generate"  # Adjust if Flask runs elsewhere
+# Point to your local Flask server's base URL
+API_BASE = "http://127.0.0.1:5000"
 
 # === Business logic ===
 def tocar_musica_existente(file_path: str):
@@ -16,7 +19,7 @@ def tocar_musica_existente(file_path: str):
 
 def processar_musica(prompt: str):
     """
-    Calls the Flask /generate endpoint with the given prompt.
+    Calls the local Flask /generate endpoint with the given prompt.
     """
     try:
         url = f"{API_BASE}/generate"
@@ -31,29 +34,16 @@ def processar_musica(prompt: str):
 # === GUI Functions ===
 
 def escolher_arquivo():
-    """
-    Abre diálogo para selecionar um arquivo de áudio já processado.
-    """
     filetypes = [("MP3 files", "*.mp3"), ("All files", "*")]
-    path = filedialog.askopenfilename(title="Selecione o arquivo de música processada",
-                                      filetypes=filetypes)
-    if not path:
-        return  # Usuário cancelou
-    tocar_musica_existente(path)
+    path = filedialog.askopenfilename(
+        title="Selecione o arquivo de música processada",
+        filetypes=filetypes
+    )
+    if path:
+        tocar_musica_existente(path)
 
 
 def nova_musica_interface():
-    """
-    Abre uma nova janela para digitar o prompt de geração de música.
-    """
-    def on_submit():
-        prompt = entry.get().strip()
-        if not prompt:
-            messagebox.showwarning("Aviso", "O prompt não pode ficar vazio.")
-            return
-        top.destroy()
-        processar_musica(prompt)
-
     top = tk.Toplevel(root_main)
     top.title("Gerar Nova Música")
     top.geometry("400x150")
@@ -63,6 +53,14 @@ def nova_musica_interface():
     entry = tk.Entry(top, width=50)
     entry.pack(pady=(0,10))
     entry.focus_set()
+
+    def on_submit():
+        prompt = entry.get().strip()
+        if not prompt:
+            messagebox.showwarning("Aviso", "O prompt não pode ficar vazio.")
+            return
+        top.destroy()
+        processar_musica(prompt)
 
     btn = tk.Button(top, text="Gerar", command=on_submit, width=15)
     btn.pack()
@@ -77,28 +75,25 @@ def criar_interface_principal():
     root_main.resizable(False, False)
 
     tk.Label(root_main, text="Selecione uma opção abaixo:").pack(pady=(10, 5))
-
     tk.Button(
         root_main,
         text="Tocar música já processada",
         command=escolher_arquivo,
-        width=30,
-        height=2
+        width=30, height=2
     ).pack(pady=(5, 2))
-
     tk.Button(
         root_main,
         text="Processar nova música",
         command=nova_musica_interface,
-        width=30,
-        height=2
+        width=30, height=2
     ).pack(pady=(2, 5))
 
     root_main.mainloop()
 
 if __name__ == '__main__':
-    print("[INFO] Serial: ok")
-    thread = threading.Thread(target=meu_serial)
-    thread.daemon = True
-    thread.start()
+    # Start serial-read thread if needed
+    if meu_serial:
+        thread = threading.Thread(target=meu_serial)
+        thread.daemon = True
+        thread.start()
     criar_interface_principal()
