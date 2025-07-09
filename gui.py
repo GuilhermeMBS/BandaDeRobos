@@ -1,8 +1,6 @@
-# gui.py
-import threading
-import requests
+import threading, requests
 import tkinter as tk
-from tkinter import filedialog, messagebox, simpledialog
+from tkinter import filedialog, messagebox
 
 # === Serial-reading stub ===
 meu_serial = None  # Replace/initialize your Serial here
