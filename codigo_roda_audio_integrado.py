@@ -8,6 +8,9 @@ from spleeter.separator import Separator
 import librosa
 import numpy as np
 import sounddevice as sd
+import json
+from datetime import datetime
+
 
 def ler_serial():
   while True:
@@ -83,13 +86,24 @@ def reproduzir_completo(arquivo_original: str, beat_times, energies, frame_ms: i
         def handler(kind=kind, val=val, t_event=t_event):
             if kind == 'beat':
                 print(f"batida: {val}")
+                meu_serial.write("batida\n".encode("UTF-8"))
             else:
                 print(f"[{t_event:6.3f}s] Energia: {val}")
+                meu_serial.write(f"energia:{val}".encode("UTF-8"))
+                if (val > 50):
+                    meu_serial.write("voz true\n".encode("UTF-8"))
+                    
+                else:
+                    meu_serial.write("voz false\n".encode("UTF-8"))
+                    
 
+        #tentar colocar um timer único ao invés de um timer para cada instante
         timer = threading.Timer(delay, handler)
         timer.daemon = True
         timer.start()
         timers.append(timer)
+        
+    return events
 
     # Aguarda fim do áudio
     sd.wait()
@@ -100,20 +114,28 @@ def reproduzir_completo(arquivo_original: str, beat_times, energies, frame_ms: i
     
 
 def escolher_arquivo():
-#     mp3_path = filedialog.askopenfilename(
-#         title="Selecione o arquivo MP3",
-#         filetypes=[("MP3 files", "*.mp3")]
-#     )
-#     if not mp3_path:
-#         return
-    verifica = True
-    while(verifica):
-        print("procurando arquivo")
-        mp3_path = "musica_recebida.mp3"
-        if os.path.exists(mp3_path):
-            verifica = False
+        # 1) lê o nome da pasta de nome_placeholder.txt
+    try:
+        with open("nome_placeholder.txt", "r") as f:
+            pasta = f.read().strip()
+    except FileNotFoundError:
+        messagebox.showerror("Erro", "Arquivo nome_placeholder.txt não encontrado.")
+        return
 
-    output_dir = "Faixa"
+    # 2) verifica existência da pasta
+    if not os.path.isdir(pasta):
+        messagebox.showerror("Erro", f"Pasta '{pasta}' não existe.")
+        return
+
+    # 3) monta caminho do MP3 dentro dessa pasta
+    mp3_path = os.path.join(pasta, "musica_recebida.mp3")
+    if not os.path.isfile(mp3_path):
+        messagebox.showerror("Erro", f"Arquivo '{mp3_path}' não encontrado.")
+        return
+
+    # 4) prepara diretório de saída Faixas/ dentro da pasta
+    output_dir = os.path.join(pasta, "Faixas")
+    os.makedirs(output_dir, exist_ok=True)
     frame_ms = 420
 
     proc = tk.Toplevel(root)
@@ -124,21 +146,18 @@ def escolher_arquivo():
     proc.update()
 
     try:
-        # 1) separa stems
+        # separa stems no diretório output_dir
         separar_stems(mp3_path, output_dir)
 
         base = os.path.splitext(os.path.basename(mp3_path))[0]
         drums_path = os.path.join(output_dir, base, 'drums.wav')
         vocals_path = os.path.join(output_dir, base, 'vocals.wav')
 
-        # 2) extrai batidas
+        # 2) extrai batidas e energias
         beat_times = extrair_batidas_drums(drums_path)
-
-        # 3) extrai energias dos vocals
         energies = extrair_energias_vocals(vocals_path, frame_ms)
 
     except Exception as e:
-        print("erro")
         proc.destroy()
         messagebox.showerror("Erro", f"Ocorreu um erro:\n{e}")
         return
@@ -149,14 +168,29 @@ def escolher_arquivo():
         f"Stems separados, {len(beat_times)} batidas extraídas e {len(energies)} janelas de energia calculadas."
     )
 
-    # 4) reproduz áudio original e printa batidas + energia
-    reproduzir_completo(mp3_path, beat_times, energies, frame_ms)
+    # 4) reproduz áudio e captura events
+    events = reproduzir_completo(mp3_path, beat_times, energies, frame_ms)
+
+    # 5) salva events em JSON
+    event_dicts = [
+        {"time": t, "type": kind, "value": val}
+        for (t, kind, val) in events
+    ]
+    json_path = os.path.join(pasta, "events.json")
+    try:
+        with open(json_path, "w", encoding="utf-8") as jf:
+            json.dump(event_dicts, jf, ensure_ascii=False, indent=2)
+    except Exception as e:
+        print(f"Não foi possível salvar {json_path}: {e}")
+
     print("fim")
     
     
+def tocar_musica_existente():
+    print("placeholder musica existente")
 
 if __name__ == '__main__':
-    meu_serial = Serial("COM5", baudrate=9600, timeout=0.1)
+    meu_serial = Serial("COM31", baudrate=9600, timeout=0.1)
     #meu_serial = None
     print("[INFO] Serial: ok")
 
@@ -166,22 +200,34 @@ if __name__ == '__main__':
 
     root = tk.Tk()
     root.title("Separador e Analisador de Áudio")
-    root.geometry("360x140")
+    root.geometry("360x180")  # aumentei um pouco a altura para caber dois botões
     root.resizable(False, False)
 
     tk.Label(
         root,
-        text="Selecione um MP3 para separar stems,\nextrair batidas e níveis de energia nos vocals"
+        text="Selecione uma opção abaixo:"
     ).pack(pady=(10,5))
+
+    # botão para tocar música já processada
     tk.Button(
         root,
-        text="Selecionar e Processar MP3",
+        text="Tocar música já processada",
+        command=tocar_musica_existente,
+        width=30,
+        height=2
+    ).pack(pady=(5,2))
+
+    # botão para processar nova música
+    tk.Button(
+        root,
+        text="Processar nova música",
         command=escolher_arquivo,
         width=30,
         height=2
-    ).pack(pady=5)
+    ).pack(pady=(2,5))
 
     root.mainloop()
+
 
 
 
