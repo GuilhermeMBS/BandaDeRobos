@@ -1,5 +1,4 @@
-import json
-import requests
+import requests, os, shutil, json, re
 from flask import Flask, request, jsonify
 from datetime import datetime
 
@@ -9,13 +8,9 @@ PORT = 5000
 
 timeline = []
 
-# task: "47fea2f7b99b56574f375e9a41053284:
-# id da música: "45de5fc3-6e30-4336-8aad-ed5d8b6fe704"
-
 app = Flask(__name__)
 callback_response = {}
-
-CALLBACK_URL = "https://32b2-139-82-11-26.ngrok-free.app/callback"
+CALLBACK_URL = "https://9ed0-139-82-11-26.ngrok-free.app/callback"
 
 
 @app.route("/generate", methods=["GET"])
@@ -45,26 +40,82 @@ def generate():
         return jsonify({"error": str(e)}), 500
 
 
+def sanitize_name(name: str) -> str:
+    return re.sub(r'[^\w\-\s]', '', name).strip()
+
+
 @app.route("/callback", methods=["GET", "POST"])
 def callback():
-    data = request.get_json()
-    print("Received callback data:")
-    print(json.dumps(data, indent=2))
     global callback_response
-    callback_response = data
-    return jsonify({"status": "received"}), 200
+
+    # --- load JSON (with fallback) ---
+    try:
+        data = request.get_json()
+        callback_response = data
+        with open("callback.json", "w") as f:
+            json.dump(data, f, indent=2)
+    except Exception as e:
+        # fallback
+        try:
+            with open("callback.json", "r") as f:
+                data = json.load(f)
+                callback_response = data
+        except Exception as e2:
+            return jsonify({"error": "Failed to read saved callback", "details": str(e2)}), 500
+
+    # --- pull out the title and the first audio URL ---
+    title = data.get("title") or data.get("data", {}).get("title")
+    if not title:
+        return jsonify({"error": "No title found in callback data"}), 400
+
+    # sanitize to safe folder/filename
+    safe_title = sanitize_name(title)
+
+    audio_entries = data.get("data", {}).get("data", [])
+    if not audio_entries:
+        return jsonify({"error": "No audio entries found"}), 400
+
+    first_entry = audio_entries[0]
+    audio_url = first_entry.get("stream_audio_url")
+    if not audio_url:
+        return jsonify({"error": "No audio URL in the first entry"}), 400
+
+    # --- create folder ---
+    folder_path = os.path.join(os.getcwd(), safe_title)
+    os.makedirs(folder_path, exist_ok=True)
+
+    # --- download & save the MP3 inside that folder ---
+    try:
+        resp = requests.get(audio_url)
+        resp.raise_for_status()
+        if "audio" not in resp.headers.get("Content-Type", ""):
+            raise ValueError(f"Not an audio stream: {resp.headers.get('Content-Type')}")
+
+        mp3_path = os.path.join(folder_path, "Musica.mp3")
+        with open(mp3_path, "wb") as f:
+            f.write(resp.content)
+
+    except Exception as e:
+        return jsonify({"status": "callback saved", "warning": "Audio not downloaded", "error": str(e)}), 206
+
+    # --- write the .txt file outside the folder ---
+    txt_filename = f"{safe_title}.txt"
+    with open(txt_filename, "w", encoding="utf-8") as txtf:
+        txtf.write(title)
+
+    return jsonify({"status": "received and audio saved", 
+                    "folder": safe_title, 
+                    "mp3_path": mp3_path, 
+                    "txt_file": txt_filename}), 200
 
 
 @app.route("/lyrics", methods=["GET", "POST"])
 def lyrics():
-    #if not callback_response:
-    #    return jsonify({"error": "No callback data yet"}), 400
+    if not callback_response:
+        return jsonify({"error": "No callback data yet"}), 400
 
-    #try:
-    # task_id = callback_response.get("task_id")
-    # audio_id = callback_response.get("audio_url", "").split("/")[-1].split(".")[0]
-    task_id = "47fea2f7b99b56574f375e9a41053284"
-    audio_id = "45de5fc3-6e30-4336-8aad-ed5d8b6fe704"
+    task_id = callback_response.get("task_id")
+    audio_id = callback_response.get("audio_url", "").split("/")[-1].split(".")[0]
 
     if not task_id or not audio_id:
         return jsonify({"error": "Missing taskId or audioId"}), 400
