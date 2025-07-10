@@ -6,21 +6,14 @@ from tkinter import filedialog, messagebox, simpledialog
 import json, librosa
 import sounddevice as sd
 import time
-from serial import Serial
 
-meu_serial = 
 API_BASE = "http://127.0.0.1:5000"
 
 mp3_path = None
 json_path = None
 
-def ler_serial_gui():
-  while True:
-    if meu_serial != None:
-      texto_recebido = meu_serial.readline().decode().strip()
-      if texto_recebido != "":
-        print(texto_recebido)
-    time.sleep(0.1)
+meu_serial = None
+
 
 def carregar_eventos(json_path: str):
     with open(json_path, 'r', encoding='utf-8') as f:
@@ -33,41 +26,6 @@ def carregar_eventos(json_path: str):
         for ev in data
     ]
     return events
-
-
-def reproduzir_com_eventos(arquivo_mp3: str, events):
-    print("RODOU")
-    # carrega e toca
-    y, sr = librosa.load(arquivo_mp3, sr=None)
-    sd.play(y, sr)
-    start = time.time()
-
-    timers = []
-    for t_event, kind, val in events:
-        delay = start + t_event - time.time() 
-
-        # callback captura valores atuais por default args
-        def handler(kind=kind, val=val, t_event=t_event):
-            if kind == 'beat':
-                print(f"batida: {val}")
-                meu_serial.write("batida\n".encode("UTF-8"))
-            else:
-                print(f"[{t_event:6.3f}s] Energia: {val}")
-                meu_serial.write(f"energia:{val}\n".encode("UTF-8"))
-                if (val > 50):
-                    meu_serial.write("voz true\n".encode("UTF-8"))
-                    
-                else:
-                    meu_serial.write("voz false\n".encode("UTF-8"))
-
-        timer = threading.Timer(delay, handler)
-        timer.daemon = True
-        timer.start()
-        timers.append(timer)
-
-    sd.wait()
-    for t in timers:
-        t.join()
     
     
 def tocar_musica_existente(folder: str):
@@ -77,7 +35,8 @@ def tocar_musica_existente(folder: str):
     mp3_path  = os.path.join(folder, "musica_recebida.mp3")
     json_path = os.path.join(folder, "eventos.json")
     events = carregar_eventos(json_path)
-    reproduzir_com_eventos(mp3_path, events)
+    from utils import reproduzir_com_eventos
+    reproduzir_com_eventos(mp3_path, events, meu_serial)
 
 
 def processar_musica(prompt: str):
@@ -146,7 +105,10 @@ def nova_musica_interface():
     btn.pack()
 
 
-def criar_interface_principal():
+def criar_interface_principal(serial):
+    global meu_serial
+    meu_serial = serial
+    
     global root_main
     root_main = tk.Tk()
     root_main.title("Separador e Analisador de Áudio")
@@ -172,9 +134,7 @@ def criar_interface_principal():
     root_main.mainloop()
         
         
-if __name__ == '__main__':
-    if meu_serial:
-        thread = threading.Thread(target=meu_serial)
-        thread.daemon = True
-        thread.start()
-    criar_interface_principal()
+# if __name__ == '__main__':
+#     thread = threading.Thread(target=meu_serial)
+#     thread.daemon = True
+#     thread.start()
