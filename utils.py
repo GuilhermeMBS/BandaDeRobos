@@ -18,7 +18,7 @@ def ler_serial():
     if meu_serial != None:
       texto_recebido = meu_serial.readline().decode().strip()
       if texto_recebido != "":
-        print(texto_recebido)
+        print("Recebido do Arduino:", texto_recebido)
     time.sleep(0.1)
 
 
@@ -87,15 +87,15 @@ def reproduzir_completo(arquivo_original: str, beat_times, energies, frame_ms: i
         def handler(kind=kind, val=val, t_event=t_event):
             if kind == 'beat':
                 print(f"batida: {val}")
-                meu_serial.write("batida\n".encode("UTF-8"))
+                meu_serial.write("$batida\n".encode("UTF-8"))
             else:
                 print(f"[{t_event:6.3f}s] Energia: {val}")
-                meu_serial.write(f"energia:{val}\n".encode("UTF-8"))
+                meu_serial.write(f"$energia:{val}\n".encode("UTF-8"))
                 if (val > 50):
-                    meu_serial.write("voz true\n".encode("UTF-8"))
+                    meu_serial.write("$voz true\n".encode("UTF-8"))
                     
                 else:
-                    meu_serial.write("voz false\n".encode("UTF-8"))
+                    meu_serial.write("$voz false\n".encode("UTF-8"))
                     
 
         #tentar colocar um timer único ao invés de um timer para cada instante
@@ -192,17 +192,48 @@ def escolher_arquivo_novo():
 
     print("fim")
     
+def reproduzir_com_eventos(arquivo_mp3: str, events, meu_serial):
+    print("RODOU")
+    # carrega e toca
+    y, sr = librosa.load(arquivo_mp3, sr=None)
+    sd.play(y, sr)
+    start = time.time()
 
-if __name__ == '__main__':
-    meu_serial = Serial("COM31", baudrate=9600, timeout=0.1)
-    gui.meu_serial = meu_serial
-    #meu_serial = None
-    print("[INFO] Serial: ok")
-    gui.criar_interface_principal()
+    timers = []
+    for t_event, kind, val in events:
+        delay = start + t_event - time.time() 
+
+        # callback captura valores atuais por default args
+        def handler(kind=kind, val=val, t_event=t_event):
+            if kind == 'beat':
+                print(f"batida: {val}")
+                meu_serial.write("$batida\n".encode("UTF-8"))
+            else:
+                print(f"[{t_event:6.3f}s] Energia: {val}")
+                meu_serial.write(f"$energia:{val}\n".encode("UTF-8"))
+                if (val > 50):
+                    meu_serial.write("$voz true\n".encode("UTF-8"))
+                    
+                else:
+                    meu_serial.write("$voz false\n".encode("UTF-8"))
+
+        timer = threading.Timer(delay, handler)
+        timer.daemon = True
+        timer.start()
+        timers.append(timer)
+
+    sd.wait()
+    for t in timers:
+        t.join()
     
 
-
-
-
-
+if __name__ == '__main__':
+    meu_serial = Serial("COM8", baudrate=9600, timeout=0.1)
+    #meu_serial = None
+    print("[INFO] Serial: ok")
+    
+    thread = threading.Thread(target=ler_serial)
+    thread.daemon = True
+    thread.start()
+    gui.criar_interface_principal(meu_serial)
 
