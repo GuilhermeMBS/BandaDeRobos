@@ -1,8 +1,8 @@
-import requests, os, shutil, json, re
+import requests, os, shutil, json, re, threading
 from flask import Flask, request, jsonify
 from datetime import datetime
 
-API_KEY = ""
+API_KEY = "53375dcdf52043db2f333ce70ed74c88"
 API_URL = "https://apibox.erweima.ai/api/v1/generate"
 PORT = 5000
 
@@ -11,6 +11,10 @@ timeline = []
 app = Flask(__name__)
 callback_response = {}
 CALLBACK_URL = "https://9ed0-139-82-11-26.ngrok-free.app/callback"
+
+
+def sanitize_name(name: str) -> str:
+    return re.sub(r'[^\w\-\s]', '', name).strip()
 
 
 @app.route("/generate", methods=["GET"])
@@ -38,10 +42,6 @@ def generate():
     
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
-
-def sanitize_name(name: str) -> str:
-    return re.sub(r'[^\w\-\s]', '', name).strip()
 
 
 @app.route("/callback", methods=["GET", "POST"])
@@ -151,7 +151,6 @@ def lyrics():
     for entry in aligned:
         word = entry["word"]
         start = entry["startS"]
-        end = entry["endS"]
         if word[0] == "[":
             verse_time = start
             ok = False
@@ -185,5 +184,14 @@ def result():
     return jsonify({"status": "waiting for callback"}), 202
 
 
+def start_flask():
+    app.run(port=5000, threaded=True)
+
 if __name__ == "__main__":
-    app.run(port=PORT)
+    # 1) Start Flask in a background thread
+    t = threading.Thread(target=start_flask, daemon=True)
+    t.start()
+
+    # 2) Now import & launch your GUI
+    import gui
+    gui.criar_interface_principal()
