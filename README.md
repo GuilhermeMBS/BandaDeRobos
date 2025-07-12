@@ -5,8 +5,8 @@ Este projeto implementa uma banda formada por **3 robôs**:
 - 🥁 Baterista
 - 🎤 Vocalista
 
-Os robôs são controlados por servos e um Arduino MEGA, e tocam músicas geradas por IA a partir de um *prompt* ou de músicas previamente geradas.  
-O sistema usa a API do Suno para gerar a música e as letras, e separa os instrumentos para que cada robô execute sua parte de forma sincronizada.
+Eles são controlados por servos conectados a um Arduino MEGA, e tocam músicas geradas por IA a partir de um *prompt* ou de músicas previamente geradas por esse mesmo local.
+O código usa a API do Suno para gerar a música e as letras, e separa os instrumentos para que cada robô execute sua parte de forma sincronizada.
 
 ---
 
@@ -31,7 +31,7 @@ Basta selecionar a pasta com o nome da música desejada e iniciar.
 Insira um prompt descritivo na nova janela e clique em gerar.
 O prompt é enviado para a API do Suno, que gera uma música e devolve o áudio e a letra.
 
-🎶 O que acontece durante a execução
+### 🎶 O que acontece durante a execução
 
 ✅ O som gerado ou escolhido é processado pelo utils.py, que:
 - separa os instrumentos (usando Spleeter)
@@ -40,11 +40,10 @@ O prompt é enviado para a API do Suno, que gera uma música e devolve o áudio 
 
 ✅ As instruções para cada robô são enviadas para o Arduino MEGA com o código arduino_implementacao.ino.
 
-🎭 Funções dos robôs
+### 🎭 Funções dos robôs
 🎤 Vocalista
 
 Acende um LED quando a música está sendo reproduzida, proporcional à energia da voz.
-
 Levanta e abaixa o braço do microfone conforme a energia.
 
 🎸 Guitarrista
@@ -64,7 +63,7 @@ utils.py	Lógica principal do programa, com tratamento de áudio e da letra
 gui.py	Interface gráfica para seleção/criação de músicas
 arduino_implementacao.ino	Código para controlar os robôs no Arduino
 
-## 🔧 Bibliotecas utilizadas
+### 🔧 Bibliotecas utilizadas
 Python
 Flask – servidor web
 requests – chamadas HTTP para a API
