@@ -5,7 +5,7 @@ import json
 import requests
 from flask import Flask, request, jsonify
 
-API_KEY      = "53375dcdf52043db2f333ce70ed74c88"
+API_KEY      = ""
 API_URL      = "https://apibox.erweima.ai/api/v1/generate"
 LYRICS_URL   = "https://apibox.erweima.ai/api/v1/generate/get-timestamped-lyrics"
 CALLBACK_URL = "https://e5dde0653f45.ngrok-free.app/callback"
