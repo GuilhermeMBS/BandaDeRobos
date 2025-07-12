@@ -1,13 +1,13 @@
 import requests, os, json, re
 from flask import Flask, request, jsonify
 
-API_KEY = ""
+API_KEY = "<API KEY>"
 API_URL = "https://apibox.erweima.ai/api/v1/generate"
 PORT = 5000
 
 timeline = []
 callback_response = {}
-CALLBACK_URL = "https://9ed0-139-82-11-26.ngrok-free.app/callback"
+CALLBACK_URL = "<NGROK SERVER>/callback"
 
 app = Flask(__name__)
 
