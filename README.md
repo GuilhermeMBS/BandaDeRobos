@@ -17,17 +17,17 @@ Em um terminal, execute:
 python server.py
 Esse servidor se conecta ao Ngrok para expor a API localmente e receber o callback da Suno com o áudio gerado.
 
-2️⃣ Em outro terminal, execute o utilitário principal
+### 2️⃣ Em outro terminal, execute o utilitário principal
 python utils.py
 
 Uma janela será aberta para você escolher entre:
 1. Selecionar uma música pronta: escolha uma pasta com os arquivos da música já gerada.
 2. Criar uma música nova: insira um prompt descritivo para que a API do Suno gere a música automaticamente.
 
-3️⃣ Para uma música pronta
+### 3️⃣ Para uma música pronta
 Basta selecionar a pasta com o nome da música desejada e iniciar.
 
-4️⃣ Para criar uma nova música
+### 4️⃣ Para criar uma nova música
 Insira um prompt descritivo na nova janela e clique em gerar.
 O prompt é enviado para a API do Suno, que gera uma música e devolve o áudio e a letra.
 
@@ -57,55 +57,35 @@ Alterna os braços e ilumina os LEDs conforme as batidas.
 
 LCD: mostra a letra da música verso a verso.
 
-🗂 Estrutura dos arquivos
+## 🗂 Estrutura dos arquivos
 Arquivo	Função
 server.py	Servidor Flask + Ngrok para comunicação com a API do Suno
 utils.py	Lógica principal do programa, com tratamento de áudio e da letra
 gui.py	Interface gráfica para seleção/criação de músicas
 arduino_implementacao.ino	Código para controlar os robôs no Arduino
 
-🔧 Bibliotecas utilizadas
+## 🔧 Bibliotecas utilizadas
 Python
 Flask – servidor web
-
 requests – chamadas HTTP para a API
-
 pyngrok – integração com Ngrok
-
 tkinter – interface gráfica
-
 spleeter – separação de stems (vocais, bateria, etc.)
-
 librosa – análise de áudio e batidas
-
 numpy – cálculos numéricos
-
 sounddevice – reprodução de áudio
-
 pyserial – comunicação com o Arduino
 
 Arduino
 Servo – controle dos servos
-
 FastLED – controle dos LEDs RGB
-
 hd44780 – controle do LCD via I2C
 
-🛠 Requisitos
-Hardware
-Arduino MEGA
-
-Servos motores para os movimentos dos robôs
-
-LED e LCD para o vocalista
-
-LEDs WS2811/WS2812 para o palco
-
-Cabos e fonte de alimentação adequados
-
-Software
-Python 3.x
-
-Arduino IDE
+### 🛠 Requisitos
+- Arduino MEGA
+- Servos motores para os movimentos dos robôs
+- LED e LCD para o vocalista
+- LEDs WS2811/WS2812 para o palco
+- Cabos e fonte de alimentação adequados
 
 Divirta-se com a banda mais robótica do mundo! 🤖🎶
