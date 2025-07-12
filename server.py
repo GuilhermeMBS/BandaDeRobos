@@ -5,10 +5,10 @@ import json
 import requests
 from flask import Flask, request, jsonify
 
-API_KEY      = "INSERT API KEY"
+API_KEY      = "<INSERT API KEY>"
 API_URL      = "https://apibox.erweima.ai/api/v1/generate"
 LYRICS_URL   = "https://apibox.erweima.ai/api/v1/generate/get-timestamped-lyrics"
-CALLBACK_URL = "https://e5dde0653f45.ngrok-free.app/callback"
+CALLBACK_URL = "<NGROK SERVER>/callback"
 
 app = Flask(__name__)
 callback_response = None
