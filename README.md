@@ -96,6 +96,6 @@ Arduino:
 - LEDs WS2811/WS2812 para o palco
 - Cabos e fonte de alimentação adequados
 
-<img width="3855" height="2135" alt="image" src="https://github.com/user-attachments/assets/c8f7af2d-9a9d-42f6-b693-b15930534e81" />
+<img width="771" height="427" alt="image" src="https://github.com/user-attachments/assets/c8f7af2d-9a9d-42f6-b693-b15930534e81" />
 
 Divirta-se com a banda mais robótica do mundo! 🤖🎶
